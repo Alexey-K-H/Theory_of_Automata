@@ -1,5 +1,8 @@
 package gui;
 
+import emptyChecker.EmptyChecker;
+import parser.ParserArguments;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -13,14 +16,8 @@ public class MainFrame extends JFrame {
         component.setFont(new Font(component.getFont().getName(), Font.PLAIN, 16));
     }
 
-    private boolean checkCorrectTextFields(JTextField n, JTextField sigma, JTextField p, JTextField s){
-        if(n.getText().isEmpty() || sigma.getText().isEmpty() || p.getText().isEmpty() || s.getText().isEmpty()){
-            return false;
-        }
-        else {
-            System.out.println("Everything is correct");
-            return true;
-        }
+    private boolean checkEmptyTextFields(JTextField n, JTextField sigma, JTextField p, JTextField s){
+        return n.getText().isEmpty() || sigma.getText().isEmpty() || p.getText().isEmpty() || s.getText().isEmpty();
     }
 
     public void run(){
@@ -42,13 +39,13 @@ public class MainFrame extends JFrame {
                 "<br> Σ - алфавит терминальных символов, который может состоять из любых символов кроме N ∪ {', \", -, >}" +
                 "<br> P - комнечное множество правил. Каждое правило имеет вид A->a, где A∈N,  a∈(N∪Σ)*" +
                 "<br> S - выделенный символ из N, считаемый конечным" +
-                "<br> e - полагается пустым символом, его можно использовать только в правилах!</html>");
-        info.setFont(new Font(info.getFont().getName(), Font.BOLD, 14));
+                "<br> e - <b>полагается пустым символом, его можно использовать только в правилах!</b></html>");
+        info.setFont(new Font(info.getFont().getName(), Font.PLAIN, 14));
         layout.putConstraint(SpringLayout.WEST, info, 20, SpringLayout.WEST, panel);
         layout.putConstraint(SpringLayout.NORTH, info, 20, SpringLayout.NORTH, panel);
         panel.add(info);
 
-        JLabel configInto = new JLabel("<html> Введите параметры КСГ:</html>");
+        JLabel configInto = new JLabel("<html> Введите параметры КСГ. Символы и правила разделяются запятой <b>без пробелов и других разделителей!</b></html>");
         configInto.setFont(new Font(configInto.getFont().getName(), Font.PLAIN, 14));
         layout.putConstraint(SpringLayout.NORTH, configInto, 20, SpringLayout.SOUTH, info);
         layout.putConstraint(SpringLayout.WEST, configInto, 20, SpringLayout.WEST, panel);
@@ -60,7 +57,7 @@ public class MainFrame extends JFrame {
         layout.putConstraint(SpringLayout.WEST, nConfig, 20, SpringLayout.WEST, panel);
         panel.add(nConfig);
 
-        JTextField nValue = new JTextField(15);
+        JTextField nValue = new JTextField("S,T",15);
         nValue.setFont(new Font(nValue.getFont().getName(), Font.PLAIN, 16));
         layout.putConstraint(SpringLayout.NORTH, nValue, 40, SpringLayout.SOUTH, configInto);
         layout.putConstraint(SpringLayout.WEST, nValue, 5, SpringLayout.EAST, nConfig);
@@ -72,7 +69,7 @@ public class MainFrame extends JFrame {
         layout.putConstraint(SpringLayout.WEST, sigmaConfig, 20, SpringLayout.WEST, panel);
         panel.add(sigmaConfig);
 
-        JTextField sigmaValue = new JTextField(15);
+        JTextField sigmaValue = new JTextField("a,b,c", 15);
         sigmaValue.setFont(new Font(sigmaValue.getFont().getName(), Font.PLAIN, 16));
         layout.putConstraint(SpringLayout.NORTH, sigmaValue, 20, SpringLayout.SOUTH, nValue);
         layout.putConstraint(SpringLayout.WEST, sigmaValue, 7, SpringLayout.EAST, sigmaConfig);
@@ -84,7 +81,7 @@ public class MainFrame extends JFrame {
         layout.putConstraint(SpringLayout.NORTH, pConfig, 25, SpringLayout.SOUTH, sigmaConfig);
         panel.add(pConfig);
 
-        JTextField pValue = new JTextField(30);
+        JTextField pValue = new JTextField("S->TT,T->cT,T->bT,T->a", 30);
         setPlainFont(pValue);
         layout.putConstraint(SpringLayout.NORTH, pValue, 20, SpringLayout.SOUTH, sigmaValue);
         layout.putConstraint(SpringLayout.WEST, pValue, 5, SpringLayout.EAST, pConfig);
@@ -96,7 +93,7 @@ public class MainFrame extends JFrame {
         layout.putConstraint(SpringLayout.NORTH, sConfig, 25, SpringLayout.SOUTH, pConfig);
         panel.add(sConfig);
 
-        JTextField sValue = new JTextField(15);
+        JTextField sValue = new JTextField("S", 15);
         setPlainFont(sValue);
         layout.putConstraint(SpringLayout.WEST, sValue, 5, SpringLayout.EAST, sConfig);
         layout.putConstraint(SpringLayout.NORTH, sValue, 20, SpringLayout.SOUTH, pValue);
@@ -121,26 +118,73 @@ public class MainFrame extends JFrame {
         panel.add(toChomsky);
 
         emptyCheck.addActionListener(e -> {
-            if(!checkCorrectTextFields(nValue, sigmaValue, pValue, sValue)){
-                JLabel error = new JLabel("Неверно заданы параметры грамматики!");
+            if(checkEmptyTextFields(nValue, sigmaValue, pValue, sValue)){
+                JLabel error = new JLabel("Не полностью заполнены значения полей!");
                 setBoldFont(error);
                 JOptionPane.showMessageDialog(null, error, "ERROR", JOptionPane.ERROR_MESSAGE);
             }
+            else{
+                ParserArguments parserArguments = new ParserArguments();
+                try {
+                    parserArguments.parse(nValue.getText(), sigmaValue.getText(), pValue.getText(), sValue.getText());
+                } catch (Exception exception) {
+                    JLabel error = new JLabel(exception.getMessage());
+                    setBoldFont(error);
+                    JOptionPane.showMessageDialog(null, error, "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
+
+                EmptyChecker emptyChecker = new EmptyChecker(parserArguments.getN(),
+                        parserArguments.getSIGMA(),
+                        parserArguments.getP(),
+                        parserArguments.getS());
+
+                emptyChecker.checkContextFreeGrammar();
+                JLabel emptyCheckResult = new JLabel();
+                if(emptyChecker.isResult()){
+                    emptyCheckResult.setText("Не пустая КСГ");
+                }
+                else {
+                    emptyCheckResult.setText("Пустая КСГ");
+                }
+                setBoldFont(emptyCheckResult);
+                JOptionPane.showMessageDialog(null, emptyCheckResult, "Проверка пустоты", JOptionPane.INFORMATION_MESSAGE);
+            }
+
         });
 
         removeChainRules.addActionListener(e -> {
-            if(!checkCorrectTextFields(nValue, sigmaValue, pValue, sValue)){
-                JLabel error = new JLabel("Неверно заданы параметры грамматики!");
+            if(checkEmptyTextFields(nValue, sigmaValue, pValue, sValue)){
+                JLabel error = new JLabel("Не полностью заполнены значения полей!");
                 setBoldFont(error);
                 JOptionPane.showMessageDialog(null, error, "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+            else{
+                try {
+                    ParserArguments parserArguments = new ParserArguments();
+                    parserArguments.parse(nValue.getText(), sigmaValue.getText(), pValue.getText(), sValue.getText());
+                } catch (Exception exception) {
+                    JLabel error = new JLabel(exception.getMessage());
+                    setBoldFont(error);
+                    JOptionPane.showMessageDialog(null, error, "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
         toChomsky.addActionListener(e -> {
-            if(!checkCorrectTextFields(nValue, sigmaValue, pValue, sValue)){
-                JLabel error = new JLabel("Неверно заданы параметры грамматики!");
+            if(checkEmptyTextFields(nValue, sigmaValue, pValue, sValue)){
+                JLabel error = new JLabel("Не полностью заполнены значения полей!");
                 setBoldFont(error);
                 JOptionPane.showMessageDialog(null, error, "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+            else{
+                try {
+                    ParserArguments parserArguments = new ParserArguments();
+                    parserArguments.parse(nValue.getText(), sigmaValue.getText(), pValue.getText(), sValue.getText());
+                } catch (Exception exception) {
+                    JLabel error = new JLabel(exception.getMessage());
+                    setBoldFont(error);
+                    JOptionPane.showMessageDialog(null, error, "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
