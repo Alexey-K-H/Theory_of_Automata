@@ -41,7 +41,7 @@ public class ParserArguments {
     public void parseSigma(String strSigma) throws Exception {
         String newStr = strSigma.replaceAll("[^->e'\"]", "");
         if ( 0 < newStr.length()) {
-            System.out.println("Использован неверный символ, попробуйте еще раз");
+            throw new Exception("Использован неверный символ, попробуйте еще раз");
         }
         else{
             for (Character c:strSigma.toCharArray()) {

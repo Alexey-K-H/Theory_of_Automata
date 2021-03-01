@@ -1,5 +1,6 @@
 package gui;
 
+import chainRulesRemover.ChainRulesRemover;
 import emptyChecker.EmptyChecker;
 import parser.ParserArguments;
 
@@ -111,12 +112,20 @@ public class MainFrame extends JFrame {
         layout.putConstraint(SpringLayout.NORTH, removeChainRules, 10, SpringLayout.SOUTH, emptyCheck);
         panel.add(removeChainRules);
 
+        JLabel chainRulesInfo = new JLabel("<html><b>Примечание:</b><br>При удалении <b>цепных правил</b> грамматика" +
+                "<br><b>не должна</b> содержать e-правил вида:<br> A->e</html>");
+        setPlainFont(chainRulesInfo);
+        layout.putConstraint(SpringLayout.EAST, chainRulesInfo, -8, SpringLayout.WEST, removeChainRules);
+        layout.putConstraint(SpringLayout.NORTH, chainRulesInfo, 10, SpringLayout.NORTH, emptyCheck);
+        panel.add(chainRulesInfo);
+
         JButton toChomsky = new JButton("Преобразовать в номальную форму Хомского");
         setBoldFont(toChomsky);
         layout.putConstraint(SpringLayout.WEST, toChomsky, this.getWidth()/2 - 50, SpringLayout.WEST, panel);
         layout.putConstraint(SpringLayout.NORTH, toChomsky, 10, SpringLayout.SOUTH, removeChainRules);
         panel.add(toChomsky);
 
+        //Проверка пустоты
         emptyCheck.addActionListener(e -> {
             if(checkEmptyTextFields(nValue, sigmaValue, pValue, sValue)){
                 JLabel error = new JLabel("Не полностью заполнены значения полей!");
@@ -152,6 +161,8 @@ public class MainFrame extends JFrame {
 
         });
 
+
+        //Удаление цепных правил
         removeChainRules.addActionListener(e -> {
             if(checkEmptyTextFields(nValue, sigmaValue, pValue, sValue)){
                 JLabel error = new JLabel("Не полностью заполнены значения полей!");
@@ -159,10 +170,24 @@ public class MainFrame extends JFrame {
                 JOptionPane.showMessageDialog(null, error, "ERROR", JOptionPane.ERROR_MESSAGE);
             }
             else{
+                ParserArguments parserArguments = new ParserArguments();
                 try {
-                    ParserArguments parserArguments = new ParserArguments();
                     parserArguments.parse(nValue.getText(), sigmaValue.getText(), pValue.getText(), sValue.getText());
                 } catch (Exception exception) {
+                    JLabel error = new JLabel(exception.getMessage());
+                    setBoldFont(error);
+                    JOptionPane.showMessageDialog(null, error, "ERROR", JOptionPane.ERROR_MESSAGE);
+                }
+
+                ChainRulesRemover chainRulesRemover = new ChainRulesRemover(parserArguments.getN(), parserArguments.getSIGMA(),
+                        parserArguments.getP(), parserArguments.getS());
+
+                try {
+                    if(chainRulesRemover.checkForERules()){
+                        System.out.println("Удаление цепных правил...");
+                    }
+                }
+                catch (Exception exception){
                     JLabel error = new JLabel(exception.getMessage());
                     setBoldFont(error);
                     JOptionPane.showMessageDialog(null, error, "ERROR", JOptionPane.ERROR_MESSAGE);
