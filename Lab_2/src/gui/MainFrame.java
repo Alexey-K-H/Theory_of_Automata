@@ -26,7 +26,7 @@ public class MainFrame extends JFrame {
         this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Dimension dimension = toolkit.getScreenSize();
-        this.setBounds(dimension.width/2 - 400, dimension.height/2 - 300, 800, 600);
+        this.setBounds(dimension.width/2 - 500, dimension.height/2 - 300, 1000, 600);
         this.setTitle("Task_2");
 
         JPanel panel = new JPanel();
@@ -58,7 +58,7 @@ public class MainFrame extends JFrame {
         layout.putConstraint(SpringLayout.WEST, nConfig, 20, SpringLayout.WEST, panel);
         panel.add(nConfig);
 
-        JTextField nValue = new JTextField("S,T",15);
+        JTextField nValue = new JTextField(15);
         nValue.setFont(new Font(nValue.getFont().getName(), Font.PLAIN, 16));
         layout.putConstraint(SpringLayout.NORTH, nValue, 40, SpringLayout.SOUTH, configInto);
         layout.putConstraint(SpringLayout.WEST, nValue, 5, SpringLayout.EAST, nConfig);
@@ -70,7 +70,7 @@ public class MainFrame extends JFrame {
         layout.putConstraint(SpringLayout.WEST, sigmaConfig, 20, SpringLayout.WEST, panel);
         panel.add(sigmaConfig);
 
-        JTextField sigmaValue = new JTextField("a,b,c", 15);
+        JTextField sigmaValue = new JTextField(15);
         sigmaValue.setFont(new Font(sigmaValue.getFont().getName(), Font.PLAIN, 16));
         layout.putConstraint(SpringLayout.NORTH, sigmaValue, 20, SpringLayout.SOUTH, nValue);
         layout.putConstraint(SpringLayout.WEST, sigmaValue, 7, SpringLayout.EAST, sigmaConfig);
@@ -82,7 +82,7 @@ public class MainFrame extends JFrame {
         layout.putConstraint(SpringLayout.NORTH, pConfig, 25, SpringLayout.SOUTH, sigmaConfig);
         panel.add(pConfig);
 
-        JTextField pValue = new JTextField("S->TT,T->cT,T->bT,T->a", 30);
+        JTextField pValue = new JTextField(30);
         setPlainFont(pValue);
         layout.putConstraint(SpringLayout.NORTH, pValue, 20, SpringLayout.SOUTH, sigmaValue);
         layout.putConstraint(SpringLayout.WEST, pValue, 5, SpringLayout.EAST, pConfig);
@@ -94,7 +94,7 @@ public class MainFrame extends JFrame {
         layout.putConstraint(SpringLayout.NORTH, sConfig, 25, SpringLayout.SOUTH, pConfig);
         panel.add(sConfig);
 
-        JTextField sValue = new JTextField("S", 15);
+        JTextField sValue = new JTextField(15);
         setPlainFont(sValue);
         layout.putConstraint(SpringLayout.WEST, sValue, 5, SpringLayout.EAST, sConfig);
         layout.putConstraint(SpringLayout.NORTH, sValue, 20, SpringLayout.SOUTH, pValue);
@@ -125,6 +125,29 @@ public class MainFrame extends JFrame {
         layout.putConstraint(SpringLayout.NORTH, toChomsky, 10, SpringLayout.SOUTH, removeChainRules);
         panel.add(toChomsky);
 
+        JButton firstTest = new JButton("<html>Пример для проверки пустоты:<br>N={S,A,B}<br>Σ={a,b}<br>P={S->AB,A->aA,A->a,B->b}<br>S={S}</html>");
+        layout.putConstraint(SpringLayout.NORTH, firstTest, 20, SpringLayout.SOUTH, configInto);
+        layout.putConstraint(SpringLayout.WEST, firstTest, 10, SpringLayout.EAST, pValue);
+        firstTest.addActionListener(e -> {
+            nValue.setText("S,A,B");
+            sigmaValue.setText("a,b");
+            pValue.setText("S->AB,A->aA,A->a,B->b");
+            sValue.setText("S");
+        });
+        panel.add(firstTest);
+
+        JButton secondTest = new JButton("<html>Пример для удаления цепных правил:<br>N={S,X,Y}<br>Σ={;,z}<br>P={S->X,X->Y,Y->Y;z}<br>S={S}</html>");
+        layout.putConstraint(SpringLayout.NORTH, secondTest, 20, SpringLayout.SOUTH, configInto);
+        layout.putConstraint(SpringLayout.WEST, secondTest, 10, SpringLayout.EAST, firstTest);
+        secondTest.addActionListener(e -> {
+            nValue.setText("S,X,Y");
+            sigmaValue.setText(";,z");
+            pValue.setText("S->X,X->Y,Y->Y;z");
+            sValue.setText("S");
+        });
+        panel.add(secondTest);
+
+
         //Проверка пустоты
         emptyCheck.addActionListener(e -> {
             if(checkEmptyTextFields(nValue, sigmaValue, pValue, sValue)){
@@ -133,34 +156,30 @@ public class MainFrame extends JFrame {
                 JOptionPane.showMessageDialog(null, error, "ERROR", JOptionPane.ERROR_MESSAGE);
             }
             else{
-                ParserArguments parserArguments = new ParserArguments();
                 try {
-                    parserArguments.parse(nValue.getText(), sigmaValue.getText(), pValue.getText(), sValue.getText());
+                    ParserArguments parserArguments = new ParserArguments(nValue.getText(), sigmaValue.getText(), pValue.getText(), sValue.getText());
+                    EmptyChecker emptyChecker = new EmptyChecker(parserArguments.getN(),
+                            parserArguments.getSIGMA(),
+                            parserArguments.getP(),
+                            parserArguments.getS());
+
+                    emptyChecker.checkContextFreeGrammar();
+                    JLabel emptyCheckResult = new JLabel();
+                    if(emptyChecker.isResult()){
+                        emptyCheckResult.setText("Не пустая КСГ");
+                    }
+                    else {
+                        emptyCheckResult.setText("Пустая КСГ");
+                    }
+                    setBoldFont(emptyCheckResult);
+                    JOptionPane.showMessageDialog(null, emptyCheckResult, "Проверка пустоты", JOptionPane.INFORMATION_MESSAGE);
                 } catch (Exception exception) {
                     JLabel error = new JLabel(exception.getMessage());
                     setBoldFont(error);
                     JOptionPane.showMessageDialog(null, error, "ERROR", JOptionPane.ERROR_MESSAGE);
                 }
-
-                EmptyChecker emptyChecker = new EmptyChecker(parserArguments.getN(),
-                        parserArguments.getSIGMA(),
-                        parserArguments.getP(),
-                        parserArguments.getS());
-
-                emptyChecker.checkContextFreeGrammar();
-                JLabel emptyCheckResult = new JLabel();
-                if(emptyChecker.isResult()){
-                    emptyCheckResult.setText("Не пустая КСГ");
-                }
-                else {
-                    emptyCheckResult.setText("Пустая КСГ");
-                }
-                setBoldFont(emptyCheckResult);
-                JOptionPane.showMessageDialog(null, emptyCheckResult, "Проверка пустоты", JOptionPane.INFORMATION_MESSAGE);
             }
-
         });
-
 
         //Удаление цепных правил
         removeChainRules.addActionListener(e -> {
@@ -170,24 +189,14 @@ public class MainFrame extends JFrame {
                 JOptionPane.showMessageDialog(null, error, "ERROR", JOptionPane.ERROR_MESSAGE);
             }
             else{
-                ParserArguments parserArguments = new ParserArguments();
                 try {
-                    parserArguments.parse(nValue.getText(), sigmaValue.getText(), pValue.getText(), sValue.getText());
-                } catch (Exception exception) {
-                    JLabel error = new JLabel(exception.getMessage());
-                    setBoldFont(error);
-                    JOptionPane.showMessageDialog(null, error, "ERROR", JOptionPane.ERROR_MESSAGE);
-                }
-
-                ChainRulesRemover chainRulesRemover = new ChainRulesRemover(parserArguments.getN(), parserArguments.getSIGMA(),
-                        parserArguments.getP(), parserArguments.getS());
-
-                try {
+                    ParserArguments parserArguments = new ParserArguments(nValue.getText(), sigmaValue.getText(), pValue.getText(), sValue.getText());
+                    ChainRulesRemover chainRulesRemover = new ChainRulesRemover(parserArguments.getN(), parserArguments.getSIGMA(),
+                            parserArguments.getP(), parserArguments.getS());
                     if(chainRulesRemover.checkForERules()){
                         System.out.println("Удаление цепных правил...");
                     }
-                }
-                catch (Exception exception){
+                } catch (Exception exception) {
                     JLabel error = new JLabel(exception.getMessage());
                     setBoldFont(error);
                     JOptionPane.showMessageDialog(null, error, "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -203,8 +212,7 @@ public class MainFrame extends JFrame {
             }
             else{
                 try {
-                    ParserArguments parserArguments = new ParserArguments();
-                    parserArguments.parse(nValue.getText(), sigmaValue.getText(), pValue.getText(), sValue.getText());
+                    ParserArguments parserArguments = new ParserArguments(nValue.getText(), sigmaValue.getText(), pValue.getText(), sValue.getText());
                 } catch (Exception exception) {
                     JLabel error = new JLabel(exception.getMessage());
                     setBoldFont(error);

@@ -8,10 +8,10 @@ import java.util.List;
 
 public class EmptyChecker {
     private HashSet<Character> N ;
-    private HashSet<Character> SIGMA;
-    private Multimap<String,Character> P;
-    private Character S;
-    private HashSet<Character> Ni;
+    private final HashSet<Character> SIGMA;
+    private final Multimap<String,Character> P;
+    private final Character S;
+    private final HashSet<Character> Ni;
     private boolean result;
 
 
@@ -56,9 +56,9 @@ public class EmptyChecker {
                 }
             }
 
-            if(!Ni.containsAll(newNi)){
+            if(!Ni.containsAll(newNi) || (Ni.equals(newNi))){
                 Ni.addAll(newNi);
-                if(Ni.contains(S)){
+                if(Ni.contains(S) || Ni.isEmpty()){
                     result = Ni.contains(S);
                     return;
                 }

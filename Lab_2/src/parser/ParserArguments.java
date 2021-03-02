@@ -1,20 +1,21 @@
 package parser;
 
 import java.util.HashSet;
+
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
 public class ParserArguments {
-    private static final HashSet<Character> N = new HashSet<>();
-    private static final HashSet<Character> SIGMA = new HashSet<>();
-    private static final Multimap<String, Character> P = ArrayListMultimap.create();
-    private static Character S;
+    private final HashSet<Character> N = new HashSet<>();
+    private final HashSet<Character> SIGMA = new HashSet<>();
+    private final Multimap<String, Character> P = ArrayListMultimap.create();
+    private Character S;
 
-    public void parse(String N, String SIGMA, String P, String S) throws Exception {
+    public ParserArguments(String N, String SIGMA, String P, String S) throws Exception{
         parseN(N);
         parseSigma(SIGMA);
-        parseP(P);
         parseS(S);
+        parseP(P);
     }
 
     public void parseN(String strN) throws Exception {
@@ -82,6 +83,7 @@ public class ParserArguments {
                         char[] a = P_current[1].toCharArray();// [ b, c, d ]
                         for (char c:a) {
                             if ((!N.contains(c) && !SIGMA.contains(c)) && c != 'e') {
+                                P.clear();
                                 throw new Exception("Использовался символ не из множеств N, ∑!");
                             }
                         }
@@ -125,4 +127,5 @@ public class ParserArguments {
     public Character getS() {
         return S;
     }
+
 }
