@@ -82,12 +82,21 @@ public class ParserArguments {
                     if(A.length == 1 && N.contains(A[0])){
                         char[] a = P_current[1].toCharArray();// [ b, c, d ]
                         for (char c:a) {
-                            if ((!N.contains(c) && !SIGMA.contains(c)) && c != 'e') {
+                            if ((!N.contains(c) && !SIGMA.contains(c)) && c != 'e' && c != '|') {
                                 P.clear();
                                 throw new Exception("Использовался символ не из множеств N, ∑!");
                             }
                         }
-                        P.put(new String(a),A[0]);
+                        String a_str = new String(a);
+                        if(a_str.contains("|")){
+                            String[] tmp = a_str.split("\\|");
+                            for(String r: tmp){
+                                P.put(r, A[0]);
+                            }
+                        }
+                        else {
+                            P.put(new String(a),A[0]);
+                        }
                     }
                     else {
                         throw new Exception("Нетерминал не принадлежит множеству N, попробуйте еще раз");

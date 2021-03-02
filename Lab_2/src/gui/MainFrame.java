@@ -136,16 +136,27 @@ public class MainFrame extends JFrame {
         });
         panel.add(firstTest);
 
-        JButton secondTest = new JButton("<html>Пример для удаления цепных правил:<br>N={S,X,Y}<br>Σ={;,z}<br>P={S->X,X->Y,Y->Y;z}<br>S={S}</html>");
+        JButton secondTest = new JButton("<html>Пример для удаления цепных правил:<br>N={S,X,Y}<br>Σ={;,z}<br>P={S->X,X->Y,Y->Y;|z}<br>S={S}</html>");
         layout.putConstraint(SpringLayout.NORTH, secondTest, 20, SpringLayout.SOUTH, configInto);
         layout.putConstraint(SpringLayout.WEST, secondTest, 10, SpringLayout.EAST, firstTest);
         secondTest.addActionListener(e -> {
             nValue.setText("S,X,Y");
             sigmaValue.setText(";,z");
-            pValue.setText("S->X,X->Y,Y->Y;z");
+            pValue.setText("S->X,X->Y,Y->Y;|z");
             sValue.setText("S");
         });
         panel.add(secondTest);
+
+        JButton thirdTest = new JButton("<html>Пример для эквивалентной формы Хомского:<br>N={S,A,B}<br>Σ={a,b}<br>P={S->aAB|BA,A->BBB|a,B->AS|b}<br>S={S}</html>");
+        layout.putConstraint(SpringLayout.NORTH, thirdTest, 10, SpringLayout.SOUTH, firstTest);
+        layout.putConstraint(SpringLayout.WEST, thirdTest, 10, SpringLayout.EAST, pValue);
+        thirdTest.addActionListener(e -> {
+            nValue.setText("S,A,B");
+            sigmaValue.setText("a,b");
+            pValue.setText("S->aAB|BA,A->BBB|a,B->AS|b");
+            sValue.setText("S");
+        });
+        panel.add(thirdTest);
 
 
         //Проверка пустоты

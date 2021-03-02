@@ -3,8 +3,7 @@ package chainRulesRemover;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class ChainRulesRemover {
     private HashSet<Character> N ;
@@ -79,7 +78,7 @@ public class ChainRulesRemover {
                     Na.add(arr[0]);
                 }
 
-                if(Na.containsAll(listA) && ((arr.length == 1 && !N.contains(arr[0])) || (arr.length > 1)) ){
+                if(N.containsAll(listA) && ((arr.length == 1 && !N.contains(arr[0])) || (arr.length > 1)) ){
                     newP.put(alpha, A);
                 }
             }
@@ -115,12 +114,25 @@ public class ChainRulesRemover {
         setNewSIGMA(sigmaValue);
 
         String pValue = "";
+        HashMap<String, String> tmp = new HashMap<>();
         for (String firstName : newP.keySet()) {
             List<Character> lastNames = (List<Character>) newP.get(firstName);
             for (Character lastName : lastNames) {
-                pValue = pValue.concat(lastName + "->" + firstName+",");
+                if(tmp.containsKey(lastName.toString())){
+//                    System.out.println("Already contain:" + lastName + "with :[" + tmp.get(lastName.toString()) + "]");
+                    String oldStr = tmp.get(lastName.toString());
+                    tmp.replace(lastName.toString(), tmp.get(lastName.toString()), oldStr + "|" + firstName);
+                }
+                else {
+                    tmp.put(lastName.toString(), firstName);
+                }
             }
         }
+
+        for(Map.Entry<String, String> entry : tmp.entrySet()){
+            pValue = pValue.concat(entry.getKey() + "->" + entry.getValue() + ",");
+        }
+
         pValue = pValue.substring(0, pValue.length()-1);
         setNewP(pValue);
 
