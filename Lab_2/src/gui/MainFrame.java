@@ -1,6 +1,7 @@
 package gui;
 
 import chainRulesRemover.ChainRulesRemover;
+import chomskiyFormer.ChomskiyFormer;
 import emptyChecker.EmptyChecker;
 import parser.ParserArguments;
 
@@ -112,10 +113,11 @@ public class MainFrame extends JFrame {
         layout.putConstraint(SpringLayout.NORTH, removeChainRules, 10, SpringLayout.SOUTH, emptyCheck);
         panel.add(removeChainRules);
 
-        JLabel chainRulesInfo = new JLabel("<html><b>Примечание:</b><br>При удалении <b>цепных правил</b> грамматика" +
-                "<br><b>не должна</b> содержать e-правил вида:<br> A->e</html>");
+        JLabel chainRulesInfo = new JLabel("<html><b>Примечание:</b><br>1)При удалении <b>цепных правил</b> грамматика" +
+                "<br><b>не должна</b> содержать e-правил вида: A->e !<br>" +
+                "2)При приведении к <b>нормальной форме Хомского</b><br>КСГ должна быть <b>приведенной!</b> </html>");
         setPlainFont(chainRulesInfo);
-        layout.putConstraint(SpringLayout.EAST, chainRulesInfo, -8, SpringLayout.WEST, removeChainRules);
+        layout.putConstraint(SpringLayout.WEST, chainRulesInfo, 10, SpringLayout.WEST, panel);
         layout.putConstraint(SpringLayout.NORTH, chainRulesInfo, 10, SpringLayout.NORTH, emptyCheck);
         panel.add(chainRulesInfo);
 
@@ -222,6 +224,7 @@ public class MainFrame extends JFrame {
             }
         });
 
+        //Приведение к нормлаьной форме Хомского
         toChomsky.addActionListener(e -> {
             if(checkEmptyTextFields(nValue, sigmaValue, pValue, sValue)){
                 JLabel error = new JLabel("Не полностью заполнены значения полей!");
@@ -231,6 +234,11 @@ public class MainFrame extends JFrame {
             else{
                 try {
                     ParserArguments parserArguments = new ParserArguments(nValue.getText(), sigmaValue.getText(), pValue.getText(), sValue.getText());
+                    ChomskiyFormer chomskiyFormer = new ChomskiyFormer(parserArguments.getN(), parserArguments.getSIGMA(),
+                            parserArguments.getP(), parserArguments.getS());
+
+                    chomskiyFormer.toChomskiy();
+
                 } catch (Exception exception) {
                     JLabel error = new JLabel(exception.getMessage());
                     setBoldFont(error);
