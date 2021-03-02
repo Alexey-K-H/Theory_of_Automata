@@ -1,16 +1,53 @@
 package chainRulesRemover;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
 import java.util.HashSet;
+import java.util.List;
 
 public class ChainRulesRemover {
     private HashSet<Character> N ;
     private HashSet<Character> SIGMA;
     private Multimap<String,Character> P;
     private Character S;
-    private HashSet<Character> Na;
 
+    private String newN;
+    private String newSIGMA;
+    private String newP_rules;
+    private String newS;
+
+    public String getNewN() {
+        return newN;
+    }
+
+    public void setNewN(String newN) {
+        this.newN = newN;
+    }
+
+    public String getNewSIGMA() {
+        return newSIGMA;
+    }
+
+    public void setNewSIGMA(String newSIGMA) {
+        this.newSIGMA = newSIGMA;
+    }
+
+    public String getNewP() {
+        return newP_rules;
+    }
+
+    public void setNewP(String newP) {
+        this.newP_rules = newP;
+    }
+
+    public String getNewS() {
+        return newS;
+    }
+
+    public void setNewS(String newS) {
+        this.newS = newS;
+    }
 
     public ChainRulesRemover(HashSet<Character> n, HashSet<Character> SIGMA, Multimap<String, Character> p, Character s) {
         N = n;
@@ -29,8 +66,69 @@ public class ChainRulesRemover {
     }
 
     public void removeChainRules(){
-        for(char A : N){
+        Multimap<String,Character> newP = ArrayListMultimap.create();//P'
 
+        for(char A : N){
+            HashSet<Character> Na = new HashSet<>();
+            Na.add(A);//Na_{0} = {A}
+
+            for(String alpha : P.keySet()){
+                List<Character> listA = (List<Character>) P.get(alpha);
+                char[] arr = alpha.toCharArray();
+                if(Na.containsAll(listA) && (arr.length == 1 && N.contains(arr[0]))){
+                    Na.add(arr[0]);
+                }
+
+                if(Na.containsAll(listA) && ((arr.length == 1 && !N.contains(arr[0])) || (arr.length > 1)) ){
+                    newP.put(alpha, A);
+                }
+            }
+
+//            System.out.print("N_{" + A + "}=[");
+//            for(char element : Na){
+//                System.out.print(element + ",");
+//            }
+//            System.out.println("]");
         }
+
+//        for (String firstName : newP.keySet()) {
+//            List<Character> lastNames = (List<Character>) newP.get(firstName);
+//            for (Character lastName : lastNames) {
+//                System.out.print(firstName + " -> { ");
+//                System.out.println(lastName + "}");
+//            }
+//        }
+
+        //Fill new params
+        String nValue = "";
+        for(char n : N){
+             nValue = nValue.concat(n + ",");
+        }
+        nValue = nValue.substring(0, nValue.length() - 1);
+        setNewN(nValue);
+
+        String sigmaValue = "";
+        for(char n : SIGMA){
+            sigmaValue = sigmaValue.concat(n + ",");
+        }
+        sigmaValue = sigmaValue.substring(0, sigmaValue.length()-1);
+        setNewSIGMA(sigmaValue);
+
+        String pValue = "";
+        for (String firstName : newP.keySet()) {
+            List<Character> lastNames = (List<Character>) newP.get(firstName);
+            for (Character lastName : lastNames) {
+                pValue = pValue.concat(lastName + "->" + firstName+",");
+            }
+        }
+        pValue = pValue.substring(0, pValue.length()-1);
+        setNewP(pValue);
+
+        setNewS(S.toString());
+
+//        System.out.println(getNewN());
+//        System.out.println(getNewSIGMA());
+//        System.out.println(getNewP());
+//        System.out.println(getNewS());
     }
 }

@@ -194,7 +194,14 @@ public class MainFrame extends JFrame {
                     ChainRulesRemover chainRulesRemover = new ChainRulesRemover(parserArguments.getN(), parserArguments.getSIGMA(),
                             parserArguments.getP(), parserArguments.getS());
                     if(chainRulesRemover.checkForERules()){
-                        System.out.println("Удаление цепных правил...");
+                        chainRulesRemover.removeChainRules();
+                        JLabel result = new JLabel("<html>Параметры полученной грамматкики<br>" +
+                                "N={" + chainRulesRemover.getNewN() + "}<br>" +
+                                "Σ={" + chainRulesRemover.getNewSIGMA() + "}<br>" +
+                                "P={" + chainRulesRemover.getNewP() + "}<br>" +
+                                "S={" + chainRulesRemover.getNewS() + "}" + "</html>");
+                        setBoldFont(result);
+                        JOptionPane.showMessageDialog(null, result, "Результат удаления цепных правил", JOptionPane.INFORMATION_MESSAGE);
                     }
                 } catch (Exception exception) {
                     JLabel error = new JLabel(exception.getMessage());
