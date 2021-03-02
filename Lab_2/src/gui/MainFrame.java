@@ -224,7 +224,7 @@ public class MainFrame extends JFrame {
             }
         });
 
-        //Приведение к нормлаьной форме Хомского
+        //Приведение к нормальной форме Хомского
         toChomsky.addActionListener(e -> {
             if(checkEmptyTextFields(nValue, sigmaValue, pValue, sValue)){
                 JLabel error = new JLabel("Не полностью заполнены значения полей!");
@@ -234,11 +234,21 @@ public class MainFrame extends JFrame {
             else{
                 try {
                     ParserArguments parserArguments = new ParserArguments(nValue.getText(), sigmaValue.getText(), pValue.getText(), sValue.getText());
+                    ChainRulesRemover chainRulesRemover = new ChainRulesRemover(parserArguments.getN(), parserArguments.getSIGMA(),
+                            parserArguments.getP(), parserArguments.getS());
                     ChomskiyFormer chomskiyFormer = new ChomskiyFormer(parserArguments.getN(), parserArguments.getSIGMA(),
                             parserArguments.getP(), parserArguments.getS());
 
-                    chomskiyFormer.toChomskiy();
-
+                    if(chainRulesRemover.checkForERules() && chomskiyFormer.checkForCycleRules() && chomskiyFormer.checkForChainRules()){
+                        chomskiyFormer.toChomskiy();
+                        JLabel result = new JLabel("<html>Параметры полученной грамматкики<br>" +
+                                "N={" + chomskiyFormer.getNewN() + "}<br>" +
+                                "Σ={" + chomskiyFormer.getNewSIGMA() + "}<br>" +
+                                "P={" + chomskiyFormer.getNewP_rules() + "}<br>" +
+                                "S={" + chomskiyFormer.getNewS() + "}" + "</html>");
+                        setBoldFont(result);
+                        JOptionPane.showMessageDialog(null, result, "Приведение к нормальной форме Хомского", JOptionPane.INFORMATION_MESSAGE);
+                    }
                 } catch (Exception exception) {
                     JLabel error = new JLabel(exception.getMessage());
                     setBoldFont(error);
