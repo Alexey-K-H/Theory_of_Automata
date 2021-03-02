@@ -121,7 +121,7 @@ public class MainFrame extends JFrame {
         layout.putConstraint(SpringLayout.NORTH, chainRulesInfo, 10, SpringLayout.NORTH, emptyCheck);
         panel.add(chainRulesInfo);
 
-        JButton toChomsky = new JButton("Преобразовать в номальную форму Хомского");
+        JButton toChomsky = new JButton("Преобразовать в нормальную форму Хомского");
         setBoldFont(toChomsky);
         layout.putConstraint(SpringLayout.WEST, toChomsky, this.getWidth()/2 - 50, SpringLayout.WEST, panel);
         layout.putConstraint(SpringLayout.NORTH, toChomsky, 10, SpringLayout.SOUTH, removeChainRules);
