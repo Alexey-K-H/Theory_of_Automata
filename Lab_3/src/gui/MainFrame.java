@@ -137,18 +137,18 @@ public class MainFrame extends JFrame {
             }
             else{
                 try {
-                    ParserArguments parserArguments = new ParserArguments(nValue.getText(), sigmaValue.getText(), pValue.getText(), sValue.getText());
+                    ParserArguments parserArguments = new ParserArguments(nValue.getText(), sigmaValue.getText(), pValue.getText(), sValue.getText(), kValue.getText());
                     StoreMemoryMachine storeMemoryMachine = new StoreMemoryMachine(parserArguments.getN(),
                             parserArguments.getSIGMA(),
                             parserArguments.getP(),
                             parserArguments.getS());
 
                     JLabel checkLL1 = new JLabel();
-                    if(storeMemoryMachine.checkLLk(Integer.parseInt(kValue.getText()))){
-                        checkLL1.setText("<html>Граммактика: LL<sub>" + kValue.getText() + "</sub></html>");
+                    if(storeMemoryMachine.checkLLk(parserArguments.getK())){
+                        checkLL1.setText("<html>Граммактика: LL<sub>" + parserArguments.getK() + "</sub></html>");
                     }
                     else {
-                        checkLL1.setText("<html>Не граммактика: LL<sub>" + kValue.getText() + "</sub></html>");
+                        checkLL1.setText("<html>Не граммактика: LL<sub>" + parserArguments.getK() + "</sub></html>");
                     }
                     setBoldFont(checkLL1);
                     JOptionPane.showMessageDialog(null, checkLL1, "Проверка LLk", JOptionPane.INFORMATION_MESSAGE);

@@ -10,12 +10,14 @@ public class ParserArguments {
     private final HashSet<Character> SIGMA = new HashSet<>();
     private final Multimap<Character, char[]> P = ArrayListMultimap.create();
     private Character S;
+    private int K;
 
-    public ParserArguments(String N, String SIGMA, String P, String S) throws Exception{
+    public ParserArguments(String N, String SIGMA, String P, String S, String K) throws Exception{
         parseN(N);
         parseSigma(SIGMA);
         parseS(S);
         parseP(P);
+        parseK(K);
     }
 
     public void parseN(String strN) throws Exception {
@@ -121,6 +123,13 @@ public class ParserArguments {
             }
     }
 
+    public void parseK(String strK) throws Exception {
+        K = Integer.parseInt(strK);
+        if(K <= 0){
+            throw new Exception("Значение K не может быть меньше 1!");
+        }
+    }
+
     public HashSet<Character> getN() {
         return N;
     }
@@ -137,4 +146,7 @@ public class ParserArguments {
         return S;
     }
 
+    public int getK() {
+        return K;
+    }
 }
