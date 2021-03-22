@@ -16,8 +16,8 @@ public class MainFrame extends JFrame {
         component.setFont(new Font(component.getFont().getName(), Font.PLAIN, 16));
     }
 
-    private boolean checkEmptyTextFields(JTextField n, JTextField sigma, JTextField p, JTextField s, JTextField k){
-        return n.getText().isEmpty() || sigma.getText().isEmpty() || p.getText().isEmpty() || s.getText().isEmpty() || k.getText().isEmpty();
+    private boolean checkEmptyTextFields(JTextField n, JTextField sigma, JTextField p, JTextField s){
+        return n.getText().isEmpty() || sigma.getText().isEmpty() || p.getText().isEmpty() || s.getText().isEmpty();
     }
 
     public void run(){
@@ -99,25 +99,13 @@ public class MainFrame extends JFrame {
         layout.putConstraint(SpringLayout.NORTH, sValue, 20, SpringLayout.SOUTH, pValue);
         panel.add(sValue);
 
-        JLabel kConfig = new JLabel("k = ");
-        setBoldFont(kConfig);
-        layout.putConstraint(SpringLayout.WEST, kConfig, 20, SpringLayout.WEST, panel);
-        layout.putConstraint(SpringLayout.NORTH, kConfig, 25, SpringLayout.SOUTH, sConfig);
-        panel.add(kConfig);
-
-        JTextField kValue = new JTextField(2);
-        setPlainFont(kValue);
-        layout.putConstraint(SpringLayout.WEST, kValue, 5, SpringLayout.EAST, kConfig);
-        layout.putConstraint(SpringLayout.NORTH, kValue, 20, SpringLayout.SOUTH, sValue);
-        panel.add(kValue);
-
-        JButton emptyCheck = new JButton("<html>Проверка LL<sub>k</sub></html>");
+        JButton emptyCheck = new JButton("<html>Проверка LL<sub>1</sub></html>");
         setBoldFont(emptyCheck);
         layout.putConstraint(SpringLayout.WEST, emptyCheck, this.getWidth()/2 - 50, SpringLayout.WEST, panel);
-        layout.putConstraint(SpringLayout.NORTH, emptyCheck, 30, SpringLayout.SOUTH, sValue);
+        layout.putConstraint(SpringLayout.NORTH, emptyCheck, 50, SpringLayout.SOUTH, sValue);
         panel.add(emptyCheck);
 
-        JButton firstTest = new JButton("<html>Пример для LL<sub>1</sub>:<br>N={S,B}<br>Σ={0,1,2}<br>P={S->B2,B->0,B->1}<br>S={S}</html>");
+        JButton firstTest = new JButton("<html>Пример LL<sub>1</sub> грамматики:<br>N={S,B}<br>Σ={0,1,2}<br>P={S->B2,B->0,B->1}<br>S={S}</html>");
         layout.putConstraint(SpringLayout.NORTH, firstTest, 20, SpringLayout.SOUTH, configInto);
         layout.putConstraint(SpringLayout.WEST, firstTest, 10, SpringLayout.EAST, pValue);
         firstTest.addActionListener(e -> {
@@ -125,33 +113,54 @@ public class MainFrame extends JFrame {
             sigmaValue.setText("0,1,2");
             pValue.setText("S->B2,B->0,B->1");
             sValue.setText("S");
-            kValue.setText("1");
         });
         panel.add(firstTest);
 
+        JButton secondTest = new JButton("<html>Пример не LL<sub>1</sub> грамматики:<br>N={S,B,A}<br>Σ={a,b}<br>P={S->A|B,A->aA|a,B->bB|b}<br>S={S}</html>");
+        layout.putConstraint(SpringLayout.NORTH, secondTest, 20, SpringLayout.SOUTH, configInto);
+        layout.putConstraint(SpringLayout.WEST, secondTest, 10, SpringLayout.EAST, firstTest);
+        secondTest.addActionListener(e -> {
+            nValue.setText("S,B,A");
+            sigmaValue.setText("a,b");
+            pValue.setText("S->A|B,A->aA|a,B->bB|b");
+            sValue.setText("S");
+        });
+        panel.add(secondTest);
+
+        JButton thirdTest = new JButton("<html>Пример LL<sub>1</sub> грамматики:<br>N={S,B,A}<br>Σ={a,b,c}<br>P={S->aAaB|bAbB,A->S|cb,B->cB|a}<br>S={S}</html>");
+        layout.putConstraint(SpringLayout.NORTH, thirdTest, 20, SpringLayout.SOUTH, firstTest);
+        layout.putConstraint(SpringLayout.WEST, thirdTest, 10, SpringLayout.EAST, pValue);
+        thirdTest.addActionListener(e -> {
+            nValue.setText("S,B,A");
+            sigmaValue.setText("a,b,c");
+            pValue.setText("S->aAaB|bAbB,A->S|cb,B->cB|a");
+            sValue.setText("S");
+        });
+        panel.add(thirdTest);
+
         emptyCheck.addActionListener(e -> {
-            if(checkEmptyTextFields(nValue, sigmaValue, pValue, sValue, kValue)){
+            if(checkEmptyTextFields(nValue, sigmaValue, pValue, sValue)){
                 JLabel error = new JLabel("Не полностью заполнены значения полей!");
                 setBoldFont(error);
                 JOptionPane.showMessageDialog(null, error, "ERROR", JOptionPane.ERROR_MESSAGE);
             }
             else{
                 try {
-                    ParserArguments parserArguments = new ParserArguments(nValue.getText(), sigmaValue.getText(), pValue.getText(), sValue.getText(), kValue.getText());
+                    ParserArguments parserArguments = new ParserArguments(nValue.getText(), sigmaValue.getText(), pValue.getText(), sValue.getText());
                     StoreMemoryMachine storeMemoryMachine = new StoreMemoryMachine(parserArguments.getN(),
                             parserArguments.getSIGMA(),
                             parserArguments.getP(),
                             parserArguments.getS());
 
                     JLabel checkLL1 = new JLabel();
-                    if(storeMemoryMachine.checkLLk(parserArguments.getK())){
-                        checkLL1.setText("<html>Граммактика: LL<sub>" + parserArguments.getK() + "</sub></html>");
+                    if(storeMemoryMachine.checkLLk()){
+                        checkLL1.setText("<html>Это грамматика: LL<sub>1</sub></html>");
                     }
                     else {
-                        checkLL1.setText("<html>Не граммактика: LL<sub>" + parserArguments.getK() + "</sub></html>");
+                        checkLL1.setText("<html>Это не грамматика: LL<sub>1</sub></html>");
                     }
                     setBoldFont(checkLL1);
-                    JOptionPane.showMessageDialog(null, checkLL1, "Проверка LLk", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, checkLL1, "Проверка LL1", JOptionPane.INFORMATION_MESSAGE);
                 } catch (Exception exception) {
                     JLabel error = new JLabel(exception.getMessage());
                     setBoldFont(error);

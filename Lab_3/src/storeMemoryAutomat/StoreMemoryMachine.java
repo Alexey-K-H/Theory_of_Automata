@@ -8,13 +8,13 @@ import java.util.Iterator;
 import java.util.List;
 
 public class StoreMemoryMachine {
-    private HashSet<Character> N;
-    private HashSet<Character> SIGMA;
-    private Multimap<Character, char[]>P;
+    private final HashSet<Character> N;
+    private final HashSet<Character> SIGMA;
+    private final Multimap<Character, char[]>P;
     private Character S;
 
     private Multimap<Character, Character> FIRST;
-    private Multimap<Character, Character> FOLLOW;
+    private final Multimap<Character, Character> FOLLOW;
 
     private boolean result;
 
@@ -27,11 +27,11 @@ public class StoreMemoryMachine {
         FOLLOW = ArrayListMultimap.create();
     }
 
-    public boolean checkLLk(int k){
+    public boolean checkLLk(){
         buildFIRST();
         buildFOLLOW();
         printSet();
-        checkRule(k);
+        checkRule();
         return result;
     }
 
@@ -121,53 +121,45 @@ public class StoreMemoryMachine {
         }
     }
 
-    private void checkRule(int k){
+    private void checkRule(){
         result = true;
 
-        for(Character firstName: P.keySet()){
-            List<char[]>  lastNames = (List<char[]>) P.get(firstName);
+        for (Character firstName : P.keySet()) {
+            List<char[]> lastNames = (List<char[]>) P.get(firstName);
             Iterator<char[]> iterator = lastNames.iterator();
 
             Multimap<Integer, Character> set = ArrayListMultimap.create();
             int i = 0;
 
             while (iterator.hasNext()){
+
                 char[] current = iterator.next();
-//                for(char c : current){
-//                    set.put(i,c);
-//                }
-                for(int j = 0; j < k && j < current.length; j++){
-                    set.put(i,current[j]);
+                for (char c : current) {
+                    set.put(i,c);
                 }
                 i++;
             }
 
-            //System.out.println("Set:" + set.toString());
-            //System.out.println(firstName);
-
             for(int integer : set.keySet()){
+
                 List<Character> c = (List<Character>) set.get(integer);
-                //System.out.println("c:" + c.toString());
-                if(c.isEmpty()){
-                    continue;
-                }
+                if(c.isEmpty()){continue;}
 
                 for(int integer1 : set.keySet()){
-                    if(integer == integer1){
-                        continue;
-                    }
+
+                    if(integer==integer1){continue;}
 
                     List<Character> c1 = (List<Character>) set.get(integer1);
-                    //System.out.println("c1:" + c1.toString());
-                    if(c1.isEmpty()){
-                        continue;
-                    }
+                    if(c1.isEmpty()){continue;}
 
                     if(c.containsAll(c1) || c1.containsAll(c)){
-                        result = false;
+                        result=false;
                         break;
                     }
+
+
                 }
+
             }
         }
     }
